@@ -278,6 +278,9 @@ auto_source_group(folly ${FOLLY_DIR} ${files} ${hfiles})
 apply_folly_compile_options_to_target(folly_base)
 # Add the generated files to the correct source group.
 source_group("folly" FILES ${CMAKE_CURRENT_BINARY_DIR}/folly/folly-config.h)
+if (BUILD_SHARED_LIBS)
+   set_target_properties(folly_base PROPERTIES POSITION_INDEPENDENT_CODE True)
+endif ()
 
 # Generate pkg-config variables from folly_deps before we add our own
 # build/install-time include directory generator expressions
@@ -306,8 +309,9 @@ target_compile_definitions(folly_base
 
 set(FOLLY_INSTALL_TARGETS folly folly_deps)
 
+option(folly_pic "Build folly_pic" OFF)
 option(PYTHON_EXTENSIONS "Build Python Bindings for Folly, requires Cython" OFF)
-if (PYTHON_EXTENSIONS)
+if (PYTHON_EXTENSIONS OR folly_pic)
   # Compile folly such that it can be linked in to a shared library
   # required for linking to python extensions
   add_library(folly_pic
